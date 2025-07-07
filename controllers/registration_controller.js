@@ -1,13 +1,86 @@
 const { Paynow } = require("paynow");
+const nodemailer = require('nodemailer');
 const registrationService = require('../services/registration_service');
+require('dotenv').config();
 
-const paynow = new Paynow("20035", "57832f6f-bd15-4877-81be-c8e30e390a88");
-paynow.resultUrl = "http://example.com/gateways/paynow/update";
-paynow.returnUrl = "http://example.com/return?gateway=paynow&merchantReference=1234";
+// Initialize Paynow with environment variables
+const paynow = new Paynow(process.env.PAYNOW_ID, process.env.PAYNOW_KEY);
+paynow.resultUrl = process.env.PAYNOW_RESULT_URL;
+paynow.returnUrl = process.env.PAYNOW_RETURN_URL;
+
+// Create email transporter
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.EMAIL_SENDER,
+    pass: process.env.EMAIL_PASSWORD
+  }
+});
+const sendRegistrationEmail = async (email, registrationNumber, name) => {
+  const mailOptions = {
+    from: process.env.EMAIL_SENDER,
+    to: email,
+    subject: '✅ Successful Registration for the Race',
+    html: `
+      <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4; padding: 40px 0;">
+        <div style="max-width: 600px; margin: auto; background: white; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); overflow: hidden;">
+          
+          <!-- Header with Logo -->
+          <div style="background-color: #00695c; padding: 20px 0; text-align: center;">
+            <img src="https://aamokxxnfpmdpayvmngs.supabase.co/storage/v1/object/public/academy//Screenshot%20from%202025-07-07%2018-42-48.png" alt="Race Logo" style="height: 60px; margin-bottom: 10px;">
+            <h1 style="color: white; font-size: 24px; margin: 0;">Race Registration Confirmation</h1>
+          </div>
+          
+          <!-- Body -->
+          <div style="padding: 30px;">
+            <h2 style="color: #2c3e50;">Hello ${name},</h2>
+            <p style="font-size: 16px; color: #333;">🎉 You have successfully registered for the race!</p>
+
+            <p style="font-size: 16px; color: #333;">
+              <strong>Your registration number is:</strong>
+              <span style="color: #00695c; font-weight: bold;">${registrationNumber}</span>
+            </p>
+
+            <p style="font-size: 16px; color: #333;">
+              Please use this registration number to proceed with payment via <strong>EcoCash</strong>.
+            </p>
+
+            <p style="font-size: 16px; color: #333;">
+              Thank you for registering — we look forward to seeing you at the event!
+            </p>
+
+            <p style="font-size: 16px; color: #333;">Best regards,<br><strong>The Race Organizing Team</strong></p>
+          </div>
+
+          <!-- Footer -->
+          <div style="background-color: #eeeeee; padding: 15px; text-align: center; color: #666;">
+            <small>© 2025 Race Event • All rights reserved</small>
+          </div>
+        </div>
+      </div>
+    `
+  };
+
+  try {
+    await transporter.sendMail(mailOptions);
+    console.log('Email sent successfully');
+  } catch (error) {
+    console.error('Error sending email:', error);
+    // Do not throw to avoid breaking the flow if email fails
+  }
+};
 
 const createRegistration = async (req, res) => {
   try {
     const athlete = await registrationService.createRegistration(req.body);
+    
+    // Send registration email
+    await sendRegistrationEmail(
+      athlete.email, 
+      athlete.registration_number,
+      `${athlete.firstName} ${athlete.lastName}`
+    );
+
     res.status(201).json({
       success: true,
       message: "Registration successful",
@@ -17,7 +90,6 @@ const createRegistration = async (req, res) => {
     res.status(400).json({
       success: false,
       message: "Registration failed",
-
       error: error.message
     });
   }
@@ -92,7 +164,6 @@ const checkPaymentStatus = async (req, res) => {
     res.status(500).json({ error: error.message });
   }
 };
-// ... existing code ...
 
 const getAllRegistrations = async (req, res) => {
   try {

@@ -9,7 +9,7 @@ const registrationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  race: {  // Added reference to races collection
+  race: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "races",
     required: true,
@@ -49,6 +49,10 @@ const registrationSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  email: {                          // <--- Added email field
+    type: String,
+    required: true,
+  },
   t_shirt_size: {
     type: String,
     required: true,
@@ -57,10 +61,10 @@ const registrationSchema = new mongoose.Schema({
     type: String,
     required: true,
     unique: true,
-    default: function() {
+    default: function () {
       return 'MPR' + Math.floor(1000000000 + Math.random() * 9000000000);
-    }
+    },
   },
-}, { timestamps: true });  // Added timestamps for created/updated
+}, { timestamps: true });
 
 module.exports = mongoose.model("registeredAthletes", registrationSchema);

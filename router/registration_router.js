@@ -14,7 +14,7 @@ const registrationController = require('../controllers/registration_controller')
  *         application/json:
  *           schema:
  *             type: object
- *             required: [firstName, lastName, race, raceName, racePrice, raceEvent, dateOfBirth, Gender, phoneNumber, t_shirt_size]
+ *             required: [firstName, lastName, race, raceName, racePrice, raceEvent, dateOfBirth, Gender, phoneNumber, email, t_shirt_size]
  *             properties:
  *               firstName:
  *                 type: string
@@ -47,6 +47,10 @@ const registrationController = require('../controllers/registration_controller')
  *               phoneNumber:
  *                 type: string
  *                 example: "0780897191"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "john.doe@example.com"
  *               t_shirt_size:
  *                 type: string
  *                 example: "M"
@@ -268,6 +272,10 @@ router.get('/athletes/:id', registrationController.getRegistrationById);
  *               phoneNumber:
  *                 type: string
  *                 example: "+263771234567"
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 example: "john.smith@example.com"
  *               t_shirt_size:
  *                 type: string
  *                 example: "L"

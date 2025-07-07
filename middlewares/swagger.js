@@ -51,6 +51,7 @@ const options = {
             },
             Gender: { type: 'string' },
             phoneNumber: { type: 'string' },
+            email: { type: 'string', format: 'email' },  // Added email field
             t_shirt_size: { type: 'string' }
           }
         },
@@ -97,6 +98,7 @@ const options = {
             },
             Gender: { type: 'string' },
             phoneNumber: { type: 'string' },
+            email: { type: 'string', format: 'email' },  // Added email field
             t_shirt_size: { type: 'string' },
             registration_number: { type: 'string' }
           }

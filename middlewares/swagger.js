@@ -9,7 +9,7 @@ const options = {
       description: 'API for managing races and athlete registrations',
     },
     servers: [
-      { url: 'http://localhost:5050', description: 'Development server' },
+      { url: 'https://race-online-registration.onrender.com', description: 'Development server' },
     ],
     components: {
       schemas: {
